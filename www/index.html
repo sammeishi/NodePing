@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover" />
+    <link rel="stylesheet" href="libs/element-ui/theme-chalk/index.css" />
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="libs/lodash/lodash.min.js"></script>
+    <script type="text/javascript" src="libs/js-yaml/js-yaml.min.js"></script>
+    <script type="text/javascript" src="libs/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="libs/vue/vue.js"></script>
+    <script type="text/javascript" src="libs/element-ui/index.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <style>
+        body{
+            font-size: 1rem;
+        }
+        .submitBtn{
+            position: fixed;
+            z-index: 99;
+            right: 5%;
+            bottom: 5%;
+        }
+        .submitBtn button{
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        .statusBar{
+            position: fixed;
+            z-index: 9999;
+            bottom: 5%;
+            left: 20%;
+            right: 20%;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #ddd;
+            font-size: 0.8rem;
+        }
+        /**
+        扩充elementui表格：增加背景进度条功能
+         */
+        .disable{
+            opacity: 0.3;
+            background: #fff !important;
+        }
+    </style>
+    <title>NodePing-1</title>
+</head>
+
+<body>
+    <div id="MAIN_CONTENT">
+        <div style="margin-top: 15px;" v-loading="isSubscribe">
+            <el-input placeholder="clash subscribe url..." :disabled="running" @keydown.enter="start" v-model="subscribeUrl" class="input-with-select">
+                <el-button slot="append"  :icon="submitBtnClass" @click="start" circle></el-button>
+            </el-input>
+        </div>
+        <el-table @sort-change="onSort" ref="table" :data="serverList" :row-class-name="setRowClass" style="width: 100%">
+            <el-table-column prop="name" width="180" sortable label="服务器" >
+                <!--通过一个id标志，用于以后寻找此元素-->
+                <template slot-scope="scope">
+                    {{ scope.row.name }}
+                    <span :id=" 'row_mark_' + scope.row.id " style="display: none;" ></span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="speed" sortable label="速度"></el-table-column>
+        </el-table>
+        <div style="height: 100px;"></div>
+        <div class="statusBar" v-show="firstRunning">
+            <i v-show="running" class="icon el-icon-loading"></i>
+            <i v-show="!running" class="icon el-icon-warning-outline"></i>
+            &nbsp; Err：{{ currCount.err }}&nbsp;&nbsp;Total：{{ currCount.done }} / {{ serverList.length }}
+        </div>
+    </div>
+</body>
+
+</html>
