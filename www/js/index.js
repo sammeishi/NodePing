@@ -20,6 +20,7 @@ function entry() {
             maxParallel: 10, //最大并行
             currHandle: null,
             limitSpeed: 2000, //测速最大速度，2000毫秒
+            debounceSortFunc: null,
             currCount: {
                 err: 0,
                 done: 0
@@ -29,12 +30,15 @@ function entry() {
             ]
         },
         mounted: function () {
+            //读取保持的url
             let keepUrl = localStorage.getItem(this.SUSaveName);
             if( keepUrl ){
                 this.subscribeUrl = keepUrl;
             }
+            //创建防抖排序
+            this.debounceSortFunc = _.debounce( (()=> this.$refs.serverTable.sort('speed','ascending') ).bind(this) ,200 );
         },
-        methods: {
+        methods:{ 
             /**
              * 更新一个服务器的测试结果.
              */
@@ -44,8 +48,8 @@ function entry() {
                 speed = status ? speed : this.limitSpeed;
                 server.speed = speed;
                 server.status = status;
-                //测速成功，根据速度显示百分比
-                status ? this.percentBg(id, Math.floor((speed / this.limitSpeed) * 100)) : null;
+                //触发排序，排序会自动设置速度百分比背景
+                this.debounceSortFunc();
             },
             start: function () {
                 if (this.running) {
@@ -92,7 +96,7 @@ function entry() {
                 return data.row.status ? "" : "disable";
             },
             /**
-             * 表格排序
+             * UI表格排序事件
              * 重新渲染速度百分比背景
              */
             onSort: function () {
@@ -159,7 +163,12 @@ function entry() {
                         that.currCount.done++;
                         that.updateRes(id, status, speed);
                     },
-                    this.stop.bind(this)
+                    //ping完成，排序一次
+                    function(){
+                        //停止
+                        that.stop();
+                        //排序
+                    }
                 );
             }
         }

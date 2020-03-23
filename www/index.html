@@ -58,7 +58,7 @@
                 <el-button slot="append"  :icon="submitBtnClass" @click="start" circle></el-button>
             </el-input>
         </div>
-        <el-table @sort-change="onSort" ref="table" :data="serverList" :row-class-name="setRowClass" style="width: 100%">
+        <el-table @sort-change="onSort" ref="serverTable" :data="serverList" :row-class-name="setRowClass" style="width: 100%">
             <el-table-column prop="name" width="180" sortable label="服务器" >
                 <!--通过一个id标志，用于以后寻找此元素-->
                 <template slot-scope="scope">
